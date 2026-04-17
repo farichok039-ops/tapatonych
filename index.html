@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>⚡ Тапатоныч | Копия Кликера Тапотолия by Vanok</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        /* Убираем синий квадратик у всех элементов */
+        *:focus, *:active, button:focus, button:active, .btn:focus, .btn:active, 
+        .tap-button:focus, .tap-button:active, .buy-btn:focus, .buy-btn:active,
+        .tab-btn:focus, .tab-btn:active, input:focus, input:active {
+            outline: none !important;
+            box-shadow: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0a0f1e 0%, #0c1222 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'Poppins', 'Roboto', system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #eef5ff;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            width: 100%;
+            background: rgba(10, 20, 30, 0.55);
+            backdrop-filter: blur(12px);
+            border-radius: 3rem;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            transition: all 0.2s;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: rgba(20, 30, 45, 0.8);
+            border: none;
+            padding: 10px 28px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 40px;
+            color: #ccddee;
+            cursor: pointer;
+            transition: 0.2s;
+            backdrop-filter: blur(4px);
+            font-family: inherit;
+            letter-spacing: 1px;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(95deg, #f5b042, #ffd966);
+            color: #1a2a3a;
+            box-shadow: 0 5px 15px rgba(255, 200, 0, 0.3);
+            text-shadow: 0 0 3px rgba(0,0,0,0.2);
+        }
+
+        .tab-pane {
+            display: none;
+            animation: fade 0.25s ease;
+        }
+
+        .tab-pane.active-pane {
+            display: block;
+        }
+
+        @keyframes fade {
+            from { opacity: 0; transform: translateY(8px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        .game-panel {
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 2rem;
+            padding: 1.8rem;
+            backdrop-filter: blur(4px);
+        }
+
+        .stats-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 1.5rem;
+            padding: 1rem 1.8rem;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #0f172ad9;
+            border-radius: 2rem;
+            padding: 10px 20px;
+            min-width: 140px;
+            text-align: center;
+            box-shadow: inset 0 0 4px #ffe6aa33, 0 5px 10px #00000030;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffdd99;
+            letter-spacing: 1px;
+        }
+
+        .click-area {
+            display: flex;
+            justify-content: center;
+            margin: 25px 0;
+        }
+
+        .tap-button {
+            background: radial-gradient(circle at 30% 20%, #ffc857, #ff9f1a);
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.5), inset 0 2px 5px rgba(255,255,200,0.8);
+            transition: 0.05s linear;
+            font-weight: bold;
+            font-size: 2rem;
+            color: #2c1a0a;
+            border: 3px solid #ffeaac;
+        }
+
+        .tap-button:active {
+            transform: scale(0.96);
+            box-shadow: 0 5px 15px black;
+        }
+
+        .upgrades-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        .upgrade-card {
+            background: #111a2be0;
+            border-radius: 1.8rem;
+            padding: 1rem 1.2rem;
+            border-left: 6px solid #ffb347;
+            transition: 0.1s;
+        }
+
+        .upgrade-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        .upgrade-desc {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin: 8px 0;
+        }
+
+        .buy-btn {
+            background: #2a3b4e;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: white;
+            font-weight: bold;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: 0.1s;
+            width: 100%;
+        }
+
+        .buy-btn:hover {
+            background: #f5a623;
+            color: #0a0f1e;
+            transform: scale(0.98);
+        }
+
+        .top-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #0e1625b3;
+            border-radius: 1.5rem;
+            overflow: hidden;
+        }
+
+        .top-table th, .top-table td {
+            padding: 12px 8px;
+            text-align: center;
+            border-bottom: 1px solid #ffd96644;
+        }
+
+        .admin-user-row {
+            background: #2a2f3f;
+        }
+
+        .auth-container {
+            max-width: 450px;
+            margin: 20px auto;
+            background: #0b1120cc;
+            padding: 2rem;
+            border-radius: 2rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            background: #1e2a3a;
+            border: 1px solid #ffc85788;
+            border-radius: 60px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .btn {
+            background: #f5a623;
+            border: none;
+            padding: 12px;
+            border-radius: 60px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .logout-btn {
+            background: #b13e3e;
+            margin-left: auto;
+            width: auto;
+            padding: 8px 20px;
+        }
+
+        .admin-panel {
+            background: #0a0f1ccc;
+            padding: 1rem;
+            border-radius: 1.5rem;
+        }
+
+        .user-list-admin {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2c2f3f;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border-left: 5px solid gold;
+            z-index: 1000;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 800px) {
+            .tap-button { width: 160px; height: 160px; font-size: 1.4rem; }
+            .stat-value { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container" id="appRoot">
+    <div id="authSection">
+        <div class="auth-container">
+            <h2 style="text-align:center;">🍩 ТАПАТОНЫЧ 🍩</h2>
+            <p style="text-align:center;">Копия Кликера Тапотолия by Vanok</p>
+            <div style="margin-top: 20px;">
+                <input type="text" id="loginUsername" class="input-field" placeholder="Логин">
+                <input type="password" id="loginPassword" class="input-field" placeholder="Пароль">
+                <button class="btn" id="doLoginBtn">Вход</button>
+                <hr style="margin: 20px 0; border-color:#ffd96633">
+                <input type="text" id="regUsername" class="input-field" placeholder="Новый логин">
+                <input type="password" id="regPassword" class="input-field" placeholder="Пароль">
+                <input type="password" id="regConfirm" class="input-field" placeholder="Повтор пароля">
+                <button class="btn" id="doRegBtn">Регистрация</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="gameSection" style="display:none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+            <h2>👑 <span id="currentUsername">---</span> | Тапатоныч</h2>
+            <button id="logoutBtn" class="btn logout-btn">🚪 Выйти</button>
+        </div>
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="gameTab">🎮 Игра</button>
+            <button class="tab-btn" data-tab="topTab">🏆 Топ-100</button>
+            <button class="tab-btn" id="adminTabBtn" style="display:none;" data-tab="adminTab">⚙️ Админ панель</button>
+        </div>
+        <div id="gameTab" class="tab-pane active-pane">
+            <div class="game-panel">
+                <div class="stats-grid">
+                    <div class="stat-card">💰 ОЧКИ<br><span class="stat-value" id="scoreValue">0</span></div>
+                    <div class="stat-card">👊 Сила клика<br><span class="stat-value" id="clickDamage">1</span></div>
+                    <div class="stat-card">🤖 Авто-урон/с<br><span class="stat-value" id="autoDPS">0</span></div>
+                    <div class="stat-card">⚡ Крит<br><span class="stat-value" id="critInfo">0% / x2.0</span></div>
+                </div>
+                <div class="click-area">
+                    <div class="tap-button" id="tapButton">
+                        🖱️ ТАП<br>💥
+                    </div>
+                </div>
+                <h3>📈 ПРОКАЧКА</h3>
+                <div class="upgrades-grid" id="upgradesContainer"></div>
+            </div>
+        </div>
+        <div id="topTab" class="tab-pane">
+            <div class="game-panel">
+                <h3>🏅 ЛУЧШИЕ ТАПАТОНЫЧИ (топ 100)</h3>
+                <div style="overflow-x: auto;">
+                    <table class="top-table" id="top100Table">
+                        <thead><tr><th>#</th><th>Игрок</th><th>Очки</th></tr></thead>
+                        <tbody id="top100Body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="adminTab" class="tab-pane">
+            <div class="admin-panel">
+                <h3>🛠️ Панель администратора</h3>
+                <button id="adminAddAllBtn" class="btn" style="background:#2e5f2e;">➕ Добавить +5000 всем</button>
+                <button id="adminResetAllBtn" class="btn" style="background:#8b3c3c;">⚠️ СБРОС ВСЕХ ДАННЫХ (кроме админа)</button>
+                <div class="user-list-admin" id="adminUserList"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const STORAGE_KEY = 'TapatonychGameDB';
+    let currentUser = null;
+    let autoInterval = null;
+    let allUsers = {};
+
+    function hashPassword(pwd) {
+        return btoa(pwd + "tapasalt2025");
+    }
+
+    function initDefaultUsers() {
+        if (!localStorage.getItem(STORAGE_KEY)) {
+            let defaultUsers = {
+                "farichok": {
+                    passwordHash: hashPassword("123Qwe"),
+                    score: 15000,
+                    upgrades: { clickPower: { level: 8 }, autoClick: { level: 5 }, crit: { level: 4 } },
+                    isAdmin: true,
+                    totalClicks: 0
+                }
+            };
+            const fakeNames = ["ТопМастер", "КликерКинг", "Тапун", "ЗолотойПалец", "МегаКлик", "КиберТап", "ЛордКлик", "ДедИнсайд", "Фартовый", "Монета"];
+            for (let i = 0; i < 15; i++) {
+                let name = fakeNames[i % fakeNames.length] + (i+1);
+                let score = Math.floor(Math.random() * 8000) + 500;
+                defaultUsers[name] = {
+                    passwordHash: hashPassword("pass123"),
+                    score: score,
+                    upgrades: { clickPower: { level: Math.floor(Math.random() * 6) + 1 }, autoClick: { level: Math.floor(Math.random() * 4) }, crit: { level: Math.floor(Math.random() * 3) } },
+                    isAdmin: false,
+                    totalClicks: 0
+                };
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultUsers));
+        }
+    }
+
+    function loadAllUsers() {
+        const data = localStorage.getItem(STORAGE_KEY);
+        if (data) allUsers = JSON.parse(data);
+        else allUsers = {};
+        if (!allUsers["farichok"]) {
+            allUsers["farichok"] = {
+                passwordHash: hashPassword("123Qwe"),
+                score: 15000,
+                upgrades: { clickPower: { level: 8 }, autoClick: { level: 5 }, crit: { level: 4 } },
+                isAdmin: true,
+                totalClicks: 0
+            };
+            saveAllUsers();
+        }
+    }
+
+    function saveAllUsers() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(allUsers));
+    }
+
+    function getUserUpgradeStats(userData) {
+        const clickLvl = userData.upgrades?.clickPower?.level || 1;
+        const autoLvl = userData.upgrades?.autoClick?.level || 0;
+        const critLvl = userData.upgrades?.crit?.level || 0;
+        const clickDamage = clickLvl;
+        const autoDPS = autoLvl;
+        const critChance = Math.min(0.6, critLvl * 0.01);
+        const critMultiplier = 2 + (critLvl * 0.1);
+        return { clickDamage, autoDPS, critChance, critMultiplier, clickLvl, autoLvl, critLvl };
+    }
+
+    function getUpgradeCost(upgradeType, currentLevel) {
+        const bases = { clickPower: 10, autoClick: 15, crit: 20 };
+        const mult = { clickPower: 1.5, autoClick: 1.6, crit: 1.7 };
+        let base = bases[upgradeType];
+        let factor = mult[upgradeType];
+        return Math.floor(base * Math.pow(factor, currentLevel));
+    }
+
+    function refreshGameUI() {
+        if (!currentUser || !allUsers[currentUser]) return;
+        const user = allUsers[currentUser];
+        const stats = getUserUpgradeStats(user);
+        document.getElementById('scoreValue').innerText = Math.floor(user.score);
+        document.getElementById('clickDamage').innerText = stats.clickDamage;
+        document.getElementById('autoDPS').innerText = stats.autoDPS;
+        document.getElementById('critInfo').innerHTML = `${Math.floor(stats.critChance*100)}% / x${stats.critMultiplier.toFixed(1)}`;
+        const container = document.getElementById('upgradesContainer');
+        if (!container) return;
+        const upgrades = [
+            { id: 'clickPower', name: '💪 Мощь тапа', desc: `+1 урон за клик (сейчас +${stats.clickDamage-1} → следующий +${stats.clickDamage})`, level: stats.clickLvl },
+            { id: 'autoClick', name: '🤖 Робот-Тапатоныч', desc: `+1 урон/сек (сейчас ${stats.autoDPS}/сек → следующий уровень: ${stats.autoDPS+1}/сек)`, level: stats.autoLvl },
+            { id: 'crit', name: '✨ Критический удар', desc: `+1% шанс крита, +0.1x множитель (сейчас шанс ${Math.floor(stats.critChance*100)}%, x${stats.critMultiplier.toFixed(1)})`, level: stats.critLvl }
+        ];
+        container.innerHTML = '';
+        for (let up of upgrades) {
+            const cost = getUpgradeCost(up.id, up.level);
+            const canBuy = user.score >= cost;
+            const card = document.createElement('div');
+            card.className = 'upgrade-card';
+            card.innerHTML = `
+                <div class="upgrade-title">${up.name} [${up.level}]</div>
+                <div class="upgrade-desc">${up.desc}</div>
+                <div>💰 Стоимость: ${cost}</div>
+                <button class="buy-btn" data-upgrade="${up.id}" ${!canBuy ? 'disabled' : ''}>КУПИТЬ</button>
+            `;
+            container.appendChild(card);
+        }
+        document.querySelectorAll('.buy-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const upgradeId = btn.getAttribute('data-upgrade');
+                buyUpgrade(upgradeId);
+            });
+        });    function buyUpgrade(upgradeId) {
+        if (!currentUser || !allUsers[currentUser]) return;
+        const user = allUsers[currentUser];
+        let currentLevel = user.upgrades[upgradeId]?.level || 0;
+        if (upgradeId === 'clickPower' && currentLevel === 0) currentLevel = 1;
+        const cost = getUpgradeCost(upgradeId, currentLevel);
+        if (user.score >= cost) {
+            user.score -= cost;
+            if (!user.upgrades[upgradeId]) user.upgrades[upgradeId] = { level: 0 };
+            user.upgrades[upgradeId].level += 1;
+            saveAllUsers();
+            refreshGameUI();
+            updateTop100Table();
+            showToast(`🚀 Улучшено!`, '#a5d6ff');
+        } else {
+            showToast('❌ Не хватает очков!', '#ffaa88');
+        }
+    }
+
+    function handleTap() {
+        if (!currentUser || !allUsers[currentUser]) return;
+        const user = allUsers[currentUser];
+        const stats = getUserUpgradeStats(user);
+        let damage = stats.clickDamage;
+        let isCrit = false;
+        if (Math.random() < stats.critChance) {
+            damage = Math.floor(damage * stats.critMultiplier);
+            isCrit = true;
+        }
+        user.score += damage;
+        user.totalClicks = (user.totalClicks || 0) + 1;
+        saveAllUsers();
+        refreshGameUI();
+        updateTop100Table();
+        if (isCrit) showToast(`💥 КРИТ! +${damage}`, '#ffcc44');
+        else showToast(`➕ +${damage}`, '#dddddd');
+        const tapBtn = document.getElementById('tapButton');
+        if(tapBtn) tapBtn.style.transform = 'scale(0.94)';
+        setTimeout(() => { if(tapBtn) tapBtn.style.transform = ''; }, 80);
+    }
+
+    function startAutoClicker() {
+        if (autoInterval) clearInterval(autoInterval);
+        if (!currentUser || !allUsers[currentUser]) return;
+        autoInterval = setInterval(() => {
+            if (!currentUser || !allUsers[currentUser]) return;
+            const user = allUsers[currentUser];
+            const stats = getUserUpgradeStats(user);
+            if (stats.autoDPS > 0) {
+                user.score += stats.autoDPS;
+                saveAllUsers();
+                refreshGameUI();
+                updateTop100Table();
+            }
+        }, 1000);
+    }
+
+    function updateTop100Table() {
+        const tbody = document.getElementById('top100Body');
+        if (!tbody) return;
+        let players = Object.keys(allUsers).map(name => ({ name, score: allUsers[name].score }));
+        players.sort((a,b) => b.score - a.score);
+        const top = players.slice(0, 100);
+        tbody.innerHTML = '';
+        top.forEach((p, idx) => {
+            const row = tbody.insertRow();
+            row.insertCell(0).innerText = idx+1;
+            row.insertCell(1).innerText = p.name + (p.name === 'farichok' ? ' 👑' : '');
+            row.insertCell(2).innerText = Math.floor(p.score);
+            if(p.name === currentUser) row.style.background = '#ffd96633';
+        });
+    }
+
+    function renderAdminUserList() {
+        const container = document.getElementById('adminUserList');
+        if (!container) return;
+        if (currentUser !== 'farichok') { container.innerHTML = '<i>Нет прав</i>'; return; }
+        let players = Object.keys(allUsers).map(name => ({ name, score: allUsers[name].score }));
+        players.sort((a,b) => b.score - a.score);
+        container.innerHTML = '';
+        players.forEach(p => {
+            const div = document.createElement('div');
+            div.style.background = '#141c2c';
+            div.style.margin = '8px 0';
+            div.style.padding = '12px';
+            div.style.borderRadius = '20px';
+            div.innerHTML = `
+                <strong>${p.name}</strong> | 💰 ${Math.floor(p.score)} 
+                <div style="display:flex; gap:8px; margin-top:6px; flex-wrap:wrap;">
+                    <input type="number" id="scoreEdit_${p.name}" placeholder="Новое кол-во" style="width:120px; background:#2a3b4e; color:white; border-radius:30px; padding:6px;">
+                    <button class="btn" style="width:auto; padding:4px 12px;" data-admin-edit="${p.name}">Установить</button>
+                    <button class="btn" style="background:#a03030; width:auto;" data-admin-del="${p.name}">🗑 Удалить</button>
+                    <button class="btn" style="background:#2e6b2e; width:auto;" data-admin-add="${p.name}">+1000</button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        document.querySelectorAll('[data-admin-edit]').forEach(btn => {
+            btn.onclick = () => {
+                const name = btn.getAttribute('data-admin-edit');
+                const input = document.getElementById(`scoreEdit_${name}`);
+                let newVal = parseInt(input.value);
+                if (isNaN(newVal)) newVal = 0;
+                if (allUsers[name]) {
+                    allUsers[name].score = newVal;
+                    saveAllUsers();
+                    if (currentUser === name) refreshGameUI();
+                    renderAdminUserList();
+                    updateTop100Table();
+                    showToast(`✅ ${name} очки = ${newVal}`);
+                }
+            };
+        });
+        document.querySelectorAll('[data-admin-del]').forEach(btn => {
+            btn.onclick = () => {
+                const name = btn.getAttribute('data-admin-del');
+                if (name === 'farichok') { showToast('❌ Нельзя удалить админа!', 'red'); return; }
+                if (allUsers[name]) {
+                    delete allUsers[name];
+                    saveAllUsers();
+                    if (currentUser === name) logout();
+                    renderAdminUserList();
+                    updateTop100Table();
+                    showToast(`🗑 Игрок ${name} удалён`);
+                }
+            };
+        });
+        document.querySelectorAll('[data-admin-add]').forEach(btn => {
+            btn.onclick = () => {
+                const name = btn.getAttribute('data-admin-add');
+                if (allUsers[name]) {
+                    allUsers[name].score += 1000;
+                    saveAllUsers();
+                    if (currentUser === name) refreshGameUI();
+                    renderAdminUserList();
+                    updateTop100Table();
+                    showToast(`➕ +1000 для ${name}`);
+                }
+            };
+        });
+    }
+
+    function adminAddAll() {
+        if (currentUser !== 'farichok') return;
+        for (let u in allUsers) {
+            allUsers[u].score += 5000;
+        }
+        saveAllUsers();
+        refreshGameUI();
+        renderAdminUserList();
+        updateTop100Table();
+        showToast('✨ Всем игрокам добавлено 5000 очков!');
+    }
+
+    function adminResetAllExceptAdmin() {
+        if (currentUser !== 'farichok') return;
+        for (let u in allUsers) {
+            if (u !== 'farichok') {
+                allUsers[u].score = 0;
+                allUsers[u].upgrades = { clickPower: { level: 1 }, autoClick: { level: 0 }, crit: { level: 0 } };
+                allUsers[u].totalClicks = 0;
+            } else {
+                allUsers[u].score = 15000;
+                allUsers[u].upgrades = { clickPower: { level: 8 }, autoClick: { level: 5 }, crit: { level: 4 } };
+            }
+        }
+        saveAllUsers();
+        if (currentUser === 'farichok') refreshGameUI();
+        renderAdminUserList();
+        updateTop100Table();
+        showToast('💣 Сброс выполнен (админ сохранён)');
+    }
+
+    function logout() {
+        if (autoInterval) clearInterval(autoInterval);
+        currentUser = null;
+        document.getElementById('gameSection').style.display = 'none';
+        document.getElementById('authSection').style.display = 'block';
+        sessionStorage.removeItem('currentUserTap');
+    }
+
+    function login(username, password) {
+        if (!allUsers[username]) { showToast('❌ Неверный логин'); return false; }
+        if (allUsers[username].passwordHash !== hashPassword(password)) { showToast('❌ Неверный пароль'); return false; }
+        currentUser = username;
+        sessionStorage.setItem('currentUserTap', username);
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('gameSection').style.display = 'block';
+        document.getElementById('currentUsername').innerText = username;
+        const adminTabBtn = document.getElementById('adminTabBtn');
+        if (username === 'farichok') adminTabBtn.style.display = 'inline-block';
+        else adminTabBtn.style.display = 'none';
+        refreshGameUI();
+        updateTop100Table();
+        if (autoInterval) clearInterval(autoInterval);
+        startAutoClicker();
+        if (username === 'farichok') renderAdminUserList();
+        showToast(`✅ Добро пожаловать, ${username}! Тапай на силу!`);
+        return true;
+    }
+
+    function register(username, password, confirm) {
+        if (!username || !password) { showToast('Заполните поля'); return false; }
+        if (password !== confirm) { showToast('Пароли не совпадают'); return false; }
+        if (allUsers[username]) { showToast('Игрок уже существует'); return false; }
+        if (username === 'farichok') { showToast('Это имя зарезервировано'); return false; }
+        allUsers[username] = {
+            passwordHash: hashPassword(password),
+            score: 0,
+            upgrades: { clickPower: { level: 1 }, autoClick: { level: 0 }, crit: { level: 0 } },
+            isAdmin: false,
+            totalClicks: 0
+        };
+        saveAllUsers();
+        showToast(`✅ Регистрация успешна! Теперь войдите.`);
+        return true;
+    }
+
+    function showToast(msg, color = '#ffd966') {
+        let toast = document.createElement('div');
+        toast.className = 'toast-msg';
+        toast.innerText = msg;
+        toast.style.background = '#1f2a3e';
+        toast.style.borderLeftColor = color;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 1800);
+    }
+
+    window.onload = () => {
+        initDefaultUsers();
+        loadAllUsers();
+        document.getElementById('authSection').style.display = 'block';
+        document.getElementById('gameSection').style.display = 'none';
+        document.getElementById('doLoginBtn').onclick = () => {
+            const user = document.getElementById('loginUsername').value.trim();
+            const pwd = document.getElementById('loginPassword').value;
+            login(user, pwd);
+        };
+        document.getElementById('doRegBtn').onclick = () => {
+            const user = document.getElementById('regUsername').value.trim();
+            const pwd = document.getElementById('regPassword').value;
+            const conf = document.getElementById('regConfirm').value;
+            if(register(user, pwd, conf)) {
+                document.getElementById('regUsername').value = '';
+                document.getElementById('regPassword').value = '';
+                document.getElementById('regConfirm').value = '';
+            }
+        };
+        document.getElementById('logoutBtn').onclick = logout;
+        document.getElementById('tapButton').onclick = handleTap;
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.onclick = () => {
+                const tabId = btn.getAttribute('data-tab');
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active-pane'));
+                document.getElementById(tabId).classList.add('active-pane');
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                if (tabId === 'adminTab' && currentUser === 'farichok') renderAdminUserList();
+                if (tabId === 'topTab') updateTop100Table();
+            };
+        });
+        document.getElementById('adminAddAllBtn')?.addEventListener('click', adminAddAll);
+        document.getElementById('adminResetAllBtn')?.addEventListener('click', adminResetAllExceptAdmin);
+        const savedUser = sessionStorage.getItem('currentUserTap');
+        if (savedUser && allUsers[savedUser]) {
+            currentUser = savedUser;
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('gameSection').style.display = 'block';
+            document.getElementById('currentUsername').innerText = savedUser;
+            if (savedUser === 'farichok') document.getElementById('adminTabBtn').style.display = 'inline-block';
+            refreshGameUI();
+            updateTop100Table();
+            startAutoClicker();
+            if(savedUser === 'farichok') renderAdminUserList();
+        }
+    };
+</script>
+</body>
+</html>
+    }
